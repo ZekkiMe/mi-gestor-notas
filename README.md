@@ -33,7 +33,7 @@ Para ejecutar esta aplicación, solo necesitas tener instalados en tu sistema:
 1.  **Clona el repositorio:**
     Abre tu terminal o Git Bash y ejecuta:
     ```bash
-    git clone #
+    git clone https://github.com/ZekkiMe/mi-gestor-notas.git
     cd mi-gestor-notas
     ```
  
