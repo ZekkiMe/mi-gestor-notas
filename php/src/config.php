@@ -1,6 +1,4 @@
 <?php
-// config.php
-
 define('DB_HOST', 'mysql'); // 'mysql' es el nombre del servicio MySQL en docker-compose
 define('DB_USER', 'user');
 define('DB_PASSWORD', 'password');

@@ -1,27 +1,21 @@
 <?php
-// Incluye el archivo de configuración de la base de datos
 include 'config.php';
 
-// Inicializa la variable de error a null
 $error = null;
 
-// --- Manejar la adición de una nueva nota ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_note') {
     $title = trim($_POST['title']);
     $content = trim($_POST['content']);
     $note_date = trim($_POST['note_date']);
 
-    // Validar formato de fecha básico y campos no vacíos
     if (!strtotime($note_date)) {
         $error = "Formato de fecha inválido.";
     } elseif (empty($title) || empty($content)) {
         $error = "El título y el contenido no pueden estar vacíos.";
     } else {
         try {
-            // Prepara y ejecuta la inserción de la nota con la fecha proporcionada
             $stmt = $pdo->prepare("INSERT INTO notes (title, content, created_at) VALUES (?, ?, ?)");
             $stmt->execute([$title, $content, $note_date]);
-            // Redirige para evitar el reenvío del formulario al recargar la página
             header("Location: index.php");
             exit();
         } catch (PDOException $e) {
@@ -30,14 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// --- Manejar la eliminación de una nota ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_note') {
-    $note_id = (int)$_POST['id']; // Asegura que el ID sea un entero
+    $note_id = (int)$_POST['id']; 
     try {
-        // Prepara y ejecuta la eliminación de la nota
         $stmt = $pdo->prepare("DELETE FROM notes WHERE id = ?");
         $stmt->execute([$note_id]);
-        // Redirige para evitar el reenvío del formulario
         header("Location: index.php");
         exit();
     } catch (PDOException $e) {
@@ -45,30 +36,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// --- Lógica para obtener y ordenar las notas ---
-// Obtener la fecha actual en formato 'YYYY-MM-DD' para comparaciones SQL
 $today_date = date('Y-m-d');
 
-$upcoming_notes = []; // Array para notas cuya fecha es hoy o futura
-$past_notes = [];     // Array para notas cuya fecha es pasada
+$upcoming_notes = [];
+$past_notes = [];
 
 try {
-    // 1. Obtener notas futuras/próximas (fecha >= hoy)
-    // Se ordenan ascendentemente para tener las más cercanas a hoy primero
     $stmt_upcoming = $pdo->prepare("SELECT id, title, content, created_at FROM notes WHERE DATE(created_at) >= ? ORDER BY created_at ASC");
     $stmt_upcoming->execute([$today_date]);
     $upcoming_notes = $stmt_upcoming->fetchAll(PDO::FETCH_ASSOC);
 
-    // 2. Obtener notas pasadas (fecha < hoy)
-    // Se ordenan descendentemente para tener las más recientes primero dentro de las pasadas
     $stmt_past = $pdo->prepare("SELECT id, title, content, created_at FROM notes WHERE DATE(created_at) < ? ORDER BY created_at DESC");
     $stmt_past->execute([$today_date]);
     $past_notes = $stmt_past->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
-    // Captura cualquier error de base de datos al cargar las notas
     $error = "Error al cargar las notas: " . $e->getMessage();
-    $upcoming_notes = []; // Asegura que los arrays estén vacíos en caso de error
+    $upcoming_notes = []; 
     $past_notes = [];
 }
 ?>
@@ -97,15 +81,14 @@ try {
             margin-bottom: 10px;
         }
         .note-content {
-            white-space: pre-wrap; /* Para preservar saltos de línea en el contenido */
+            white-space: pre-wrap;
         }
-        /* Estilos específicos para notas pasadas */
         .note-card.bg-light {
-            border: 1px dashed #ccc; /* Borde punteado para diferenciar */
+            border: 1px dashed #ccc;
         }
         .note-card.bg-light .card-title,
         .note-card.bg-light .note-content {
-            color: #6c757d !important; /* Color de texto más tenue */
+            color: #6c757d !important;
         }
     </style>
 </head>
